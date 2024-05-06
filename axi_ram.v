@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2018 Alex Forencich
+Copyright (c) 2018 Alex Forencich1
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,16 +27,19 @@ THE SOFTWARE.
 `resetall
 `timescale 1ns / 1ps
 `default_nettype none
+`define VALID_ADDR_WIDTH 32
+`define WORD_WIDTH 4
+`define WORD_SIZE 8
 
 /*
  * AXI4 RAM
  */
-module axi_ram #
+module axi_ram_sim #
 (
     // Width of data bus in bits
     parameter DATA_WIDTH = 32,
     // Width of address bus in bits
-    parameter ADDR_WIDTH = 16,
+    parameter ADDR_WIDTH = 32,
     // Width of wstrb (width of data bus in words)
     parameter STRB_WIDTH = (DATA_WIDTH/8),
     // Width of ID signal
@@ -48,58 +51,62 @@ module axi_ram #
     input  wire                   clk,
     input  wire                   rst,
 
-    input  wire [ID_WIDTH-1:0]    s_axi_awid,
-    input  wire [ADDR_WIDTH-1:0]  s_axi_awaddr,
-    input  wire [7:0]             s_axi_awlen,
-    input  wire [2:0]             s_axi_awsize,
-    input  wire [1:0]             s_axi_awburst,
-    input  wire                   s_axi_awlock,
-    input  wire [3:0]             s_axi_awcache,
-    input  wire [2:0]             s_axi_awprot,
-    input  wire                   s_axi_awvalid,
-    output wire                   s_axi_awready,
-    input  wire [DATA_WIDTH-1:0]  s_axi_wdata,
-    input  wire [STRB_WIDTH-1:0]  s_axi_wstrb,
-    input  wire                   s_axi_wlast,
-    input  wire                   s_axi_wvalid,
-    output wire                   s_axi_wready,
+    input  wire [ID_WIDTH-1:0]    s_axi_awid,//
+    input  wire [ADDR_WIDTH-1:0]  s_axi_awaddr,//
+    input  wire [7:0]             s_axi_awlen,//
+    input  wire [2:0]             s_axi_awsize,//
+    input  wire [1:0]             s_axi_awburst,//
+    input  wire                   s_axi_awlock,//
+    input  wire [3:0]             s_axi_awcache,//
+    input  wire [2:0]             s_axi_awprot,//
+    input  wire                   s_axi_awvalid,//
+    output wire                   s_axi_awready,//
+    input  wire [DATA_WIDTH-1:0]  s_axi_wdata,//
+    input  wire [STRB_WIDTH-1:0]  s_axi_wstrb,//
+    input  wire                   s_axi_wlast,//
+    input  wire                   s_axi_wvalid,//
+    output wire                   s_axi_wready,//
     output wire [ID_WIDTH-1:0]    s_axi_bid,
-    output wire [1:0]             s_axi_bresp,
-    output wire                   s_axi_bvalid,
-    input  wire                   s_axi_bready,
-    input  wire [ID_WIDTH-1:0]    s_axi_arid,
-    input  wire [ADDR_WIDTH-1:0]  s_axi_araddr,
-    input  wire [7:0]             s_axi_arlen,
-    input  wire [2:0]             s_axi_arsize,
-    input  wire [1:0]             s_axi_arburst,
-    input  wire                   s_axi_arlock,
-    input  wire [3:0]             s_axi_arcache,
-    input  wire [2:0]             s_axi_arprot,
-    input  wire                   s_axi_arvalid,
-    output wire                   s_axi_arready,
-    output wire [ID_WIDTH-1:0]    s_axi_rid,
-    output wire [DATA_WIDTH-1:0]  s_axi_rdata,
-    output wire [1:0]             s_axi_rresp,
-    output wire                   s_axi_rlast,
-    output wire                   s_axi_rvalid,
-    input  wire                   s_axi_rready
+    output wire [1:0]             s_axi_bresp,//
+    output wire                   s_axi_bvalid,//
+    input  wire                   s_axi_bready,//
+
+    input  wire [ID_WIDTH-1:0]    s_axi_arid,//
+    input  wire [ADDR_WIDTH-1:0]  s_axi_araddr,//
+    input  wire [7:0]             s_axi_arlen,//
+    input  wire [2:0]             s_axi_arsize,//
+    input  wire [1:0]             s_axi_arburst,//
+    input  wire                   s_axi_arlock,//
+    input  wire [3:0]             s_axi_arcache,//
+    input  wire [2:0]             s_axi_arprot,//
+    input  wire                   s_axi_arvalid,//
+    output wire                   s_axi_arready,//
+    output wire [ID_WIDTH-1:0]    s_axi_rid,//
+    output wire [DATA_WIDTH-1:0]  s_axi_rdata,//
+    output wire [1:0]             s_axi_rresp,//
+    output wire                   s_axi_rlast,//
+    output wire                   s_axi_rvalid,//
+    input  wire                   s_axi_rready//
 );
 
-parameter VALID_ADDR_WIDTH = ADDR_WIDTH - $clog2(STRB_WIDTH);
-parameter WORD_WIDTH = STRB_WIDTH;
-parameter WORD_SIZE = DATA_WIDTH/WORD_WIDTH;
+//parameter VALID_ADDR_WIDTH = ADDR_WIDTH - $clog2(STRB_WIDTH);
+//parameter WORD_WIDTH = STRB_WIDTH;
+//parameter `WORD_SIZE = DATA_WIDTH/WORD_WIDTH;
 
 // bus width assertions
-initial begin
-    if (WORD_SIZE * STRB_WIDTH != DATA_WIDTH) begin
+/*initial begin
+    if (`WORD_SIZE * STRB_WIDTH != DATA_WIDTH) begin
         $error("Error: AXI data width not evenly divisble (instance %m)");
         $finish;
     end
 
-    if (2**$clog2(WORD_WIDTH) != WORD_WIDTH) begin
+    if (2**$clog2(`WORD_WIDTH) != `WORD_WIDTH) begin
         $error("Error: AXI word width must be even power of two (instance %m)");
         $finish;
     end
+end*/
+initial begin
+$readmemh("mem1.mem", mem);
 end
 
 localparam [0:0]
@@ -144,12 +151,12 @@ reg s_axi_rlast_pipe_reg = 1'b0;
 reg s_axi_rvalid_pipe_reg = 1'b0;
 
 // (* RAM_STYLE="BLOCK" *)
-reg [DATA_WIDTH-1:0] mem[(2**VALID_ADDR_WIDTH)-1:0];
+reg [DATA_WIDTH-1:0] mem[1000000:0]; //Changes -ADDR_WIDTH
 
-wire [VALID_ADDR_WIDTH-1:0] s_axi_awaddr_valid = s_axi_awaddr >> (ADDR_WIDTH - VALID_ADDR_WIDTH);
-wire [VALID_ADDR_WIDTH-1:0] s_axi_araddr_valid = s_axi_araddr >> (ADDR_WIDTH - VALID_ADDR_WIDTH);
-wire [VALID_ADDR_WIDTH-1:0] read_addr_valid = read_addr_reg >> (ADDR_WIDTH - VALID_ADDR_WIDTH);
-wire [VALID_ADDR_WIDTH-1:0] write_addr_valid = write_addr_reg >> (ADDR_WIDTH - VALID_ADDR_WIDTH);
+wire [`VALID_ADDR_WIDTH-1:0] s_axi_awaddr_valid = s_axi_awaddr >> (ADDR_WIDTH - `VALID_ADDR_WIDTH);
+wire [`VALID_ADDR_WIDTH-1:0] s_axi_araddr_valid = s_axi_araddr >> (ADDR_WIDTH - `VALID_ADDR_WIDTH);
+wire [`VALID_ADDR_WIDTH-1:0] read_addr_valid = read_addr_reg >> (ADDR_WIDTH - `VALID_ADDR_WIDTH);
+wire [`VALID_ADDR_WIDTH-1:0] write_addr_valid = write_addr_reg >> (ADDR_WIDTH - `VALID_ADDR_WIDTH);
 
 assign s_axi_awready = s_axi_awready_reg;
 assign s_axi_wready = s_axi_wready_reg;
@@ -165,15 +172,15 @@ assign s_axi_rvalid = PIPELINE_OUTPUT ? s_axi_rvalid_pipe_reg : s_axi_rvalid_reg
 
 integer i, j;
 
-initial begin
+/*initial begin
     // two nested loops for smaller number of iterations per loop
     // workaround for synthesizer complaints about large loop counts
-    for (i = 0; i < 2**VALID_ADDR_WIDTH; i = i + 2**(VALID_ADDR_WIDTH/2)) begin
-        for (j = i; j < i + 2**(VALID_ADDR_WIDTH/2); j = j + 1) begin
+    for (i = 0; i < 2**`VALID_ADDR_WIDTH; i = i + 2**(`VALID_ADDR_WIDTH/2)) begin
+        for (j = i; j < i + 2**(`VALID_ADDR_WIDTH/2); j = j + 1) begin
             mem[j] = 0;
         end
     end
-end
+end*/
 
 always @* begin
     write_state_next = WRITE_STATE_IDLE;
@@ -262,15 +269,14 @@ always @(posedge clk) begin
     s_axi_bid_reg <= s_axi_bid_next;
     s_axi_bvalid_reg <= s_axi_bvalid_next;
 
-    for (i = 0; i < WORD_WIDTH; i = i + 1) begin
+    for (i = 0; i < `WORD_WIDTH; i = i + 1) begin
         if (mem_wr_en & s_axi_wstrb[i]) begin
-            mem[write_addr_valid][WORD_SIZE*i +: WORD_SIZE] <= s_axi_wdata[WORD_SIZE*i +: WORD_SIZE];
+            mem[write_addr_valid/4 - 32'h10000000][`WORD_SIZE*i +: `WORD_SIZE] <= s_axi_wdata[`WORD_SIZE*i +: `WORD_SIZE]; // - 32'h40000000
         end
     end
 
-    if (rst) begin
+    if (!rst) begin
         write_state_reg <= WRITE_STATE_IDLE;
-
         s_axi_awready_reg <= 1'b0;
         s_axi_wready_reg <= 1'b0;
         s_axi_bvalid_reg <= 1'b0;
@@ -349,7 +355,7 @@ always @(posedge clk) begin
     s_axi_rvalid_reg <= s_axi_rvalid_next;
 
     if (mem_rd_en) begin
-        s_axi_rdata_reg <= mem[read_addr_valid];
+        s_axi_rdata_reg <= mem[read_addr_valid/4 - 32'h10000000];//- 32'h40000000
     end
 
     if (!s_axi_rvalid_pipe_reg || s_axi_rready) begin
@@ -359,9 +365,8 @@ always @(posedge clk) begin
         s_axi_rvalid_pipe_reg <= s_axi_rvalid_reg;
     end
 
-    if (rst) begin
+    if (!rst) begin
         read_state_reg <= READ_STATE_IDLE;
-
         s_axi_arready_reg <= 1'b0;
         s_axi_rvalid_reg <= 1'b0;
         s_axi_rvalid_pipe_reg <= 1'b0;
