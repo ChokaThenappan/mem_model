@@ -672,22 +672,24 @@ begin
   no_eth0 : if SIMULATION = true or CFG_GRETH = 0 generate
     eth0_apbo <= apb_none;
     sgmii0_apbo <= apb_none;
-    eth0_ahbmo <= ahbm_none;
-    --edcl_ahbmo <= ahbm_none;
+    --eth0_ahbmo <= ahbm_none;
+    edcl_ahbmo <= ahbm_none;
     txp <= '0';
     txn <= '1';
     emdc <= '0';
     erst <= '0';
     emdio <= '0';
-	
-	edcl_ahb_emu_i : edcl_ahbmst_emu
-	port(
-	clk => chip_refclk,
-	reset => rstn,
-	ahbmo => edcl_ahbmo,
-	ahbmi => etho_ahbmi
-	);
-  end generate;
+
+    edcl_ahb_emu_i : edcl_ahbmst_emu
+    generic map(
+      hindex => CFG_AHB_JTAG + 1 
+    )
+    port map (
+      clk   => chip_refclk,
+      reset => rstn,
+      ahbmo => eth0_ahbmo,
+      ahbmi => eth0_ahbmi
+    );
 
   -----------------------------------------------------------------------------
   -- CHIP
